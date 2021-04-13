@@ -2,6 +2,7 @@ package com.human.edu;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -9,13 +10,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.HashMap;
+
+import core.AsyncResponse;
+import core.PostResponseAsyncTask;
+
 public class LoginActivity extends AppCompatActivity {
     Button btnLogin;
-
-
-
-
-
+    EditText editTextID, editTextPassword;
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -53,21 +55,44 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         btnLogin = findViewById(R.id.btnLogin);
+        editTextID = findViewById(R.id.editTextID);
+        editTextPassword = findViewById(R.id.editTextPassword);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText editTextID,editTextPassword;
-                editTextID = findViewById(R.id.editTextID);
-                editTextPassword = findViewById(R.id.editTextPassword);
+                //스프링으로 보낼 데이터를 해시맵 타입으로 저장
+                HashMap postDataParams = new HashMap();
+                postDataParams.put("txtUsername",editTextID.getText().toString());
+                postDataParams.put("txtPassword",editTextPassword.getText().toString());
+                //스프링앱 주소를 지정
+                String requestUrl = "http://192.168.55.152:8080/android/login";
+                //jsp의 Ajax과 같은 역할의 AsyncTask클래스 사용
+                PostResponseAsyncTask readTask = new PostResponseAsyncTask(LoginActivity.this, postDataParams, new AsyncResponse() {
+                    @Override
+                    public void processFinish(String output) {//output는 스프링앱에서 전송받은 로그인 사용자 정보
+                        Toast.makeText(LoginActivity.this, output+"디버그", Toast.LENGTH_SHORT).show();
+                        String jsonString = output.substring(output.indexOf('{'),output.indexOf('}'));
+                        if(!jsonString.equals("{}")) { //로그인 사용자 정보가 있으면
+                            Log.i("디버그", jsonString);
+                            //로그인 이후 액티비티를 여기서 띄우기
+                        }else{
+                            Toast.makeText(LoginActivity.this, "로그인 실패", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                readTask.execute(requestUrl);//1번 작업(백그라운드호출)
+                /* 로그인 인증 이후에 사용
+                //Intent는 안드로이드앱에서 액티비티간 데이터를 전송하는 클래스
                 Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                 mainIntent.putExtra("editTextID", editTextID.getText().toString());
                 mainIntent.putExtra("editTextPassword", editTextPassword.getText().toString());
                 startActivity(mainIntent);
+                 */
             }
         });
     }
-
-    public void gotoMain(View view) {
+    //login.xml에서 onClick 속성을 gotoMain이라고 지정했을 경우 사용가능(아래)
+    public void gotoMain(View view) { //여기서 view는 클릭이벤트가 발생한 버튼
         EditText editTextID, editTextPassword;
         editTextID = findViewById(R.id.editTextID);
         editTextPassword = findViewById(R.id.editTextPassword);
