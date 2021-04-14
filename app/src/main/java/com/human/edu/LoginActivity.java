@@ -21,7 +21,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Toast.makeText(LoginActivity.this, "onDestroy상태6", Toast.LENGTH_LONG).show();
+        Toast.makeText(LoginActivity.this, "onDestory상태6", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //스프링으로 보낼 데이터를 해시맵 타입으로 저장
+                //스프링으로 보낼 데이터를 해시맵 타입을 저장
                 HashMap postDataParams = new HashMap();
                 postDataParams.put("txtUsername",editTextID.getText().toString());
                 postDataParams.put("txtPassword",editTextPassword.getText().toString());
@@ -75,6 +75,8 @@ public class LoginActivity extends AppCompatActivity {
                         if(!jsonString.equals("{}")) { //로그인 사용자 정보가 있으면
                             Log.i("디버그", jsonString);
                             //로그인 이후 액티비티를 여기서 띄우기
+                            Intent intent = new Intent(LoginActivity.this, SubActivity.class);
+                            startActivity(intent);
                         }else{
                             Toast.makeText(LoginActivity.this, "로그인 실패", Toast.LENGTH_LONG).show();
                         }
@@ -103,6 +105,6 @@ public class LoginActivity extends AppCompatActivity {
         mainIntent.putExtra("editTextID", editTextID.getText().toString());//아이디
         mainIntent.putExtra("editTextPassword", editTextPassword.getText().toString());//암호
         startActivity(mainIntent);//편지봉투Intent를 개봉 = 화면불러오기실행
-        finish();//LoginActivity화면을 종료(프로그램종료X)
+        //finish();//LoginActivity화면을 종료(프로그램종료X)
     }
 }
